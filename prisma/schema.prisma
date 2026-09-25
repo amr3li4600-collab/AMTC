@@ -1,0 +1,155 @@
+// AMTC CrewEligible — Database Schema
+// Prisma 7 with prisma-client generator for Supabase PostgreSQL
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  STAFF
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum CEMPNStatus {
+  VALID
+  EXPIRING_SOON
+  EXPIRED
+}
+
+enum SwimmingStatus {
+  PASSED
+  PENDING
+  FAILED
+}
+
+enum DGACStatus {
+  ENROLLED
+  WRITTEN_PASSED
+  PRACTICAL_PASSED
+  CERTIFIED
+}
+
+enum PlacementStatus {
+  APPLIED
+  ASSESSMENT_DAY
+  FINAL_INTERVIEW
+  HIRED
+}
+
+enum CEFRLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+  C2
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         Role     @default(STAFF)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Student {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  // ── Personal Data ──
+  fullName    String
+  cin         String  @unique // National ID
+  phone       String
+  email       String?
+  dateOfBirth DateTime
+  gender      Gender
+  photoUrl    String?
+
+  // ── Physical Metrics ──
+  height             Float // cm
+  weight             Float // kg
+  bmi                Float // auto-calculated
+  armReach           Float // cm
+  hasTattoos         Boolean @default(false)
+  tattoosDescription String?
+  hasScars           Boolean @default(false)
+  scarsDescription   String?
+
+  // ── CEMPN Medical Certificate ──
+  cempnIssueDate      DateTime?
+  cempnExpirationDate DateTime?
+  cempnStatus         CEMPNStatus @default(VALID)
+
+  // ── Passport ──
+  passportNumber         String?
+  passportExpirationDate DateTime?
+  heldVisas              String? // Comma-separated or JSON
+
+  // ── Certifications & Status ──
+  swimmingStatus  SwimmingStatus  @default(PENDING)
+  dgacStatus      DGACStatus      @default(ENROLLED)
+  placementStatus PlacementStatus @default(APPLIED)
+
+  // ── Relations ──
+  languages Language[]
+
+  @@index([passportExpirationDate])
+  @@index([cempnExpirationDate])
+  @@index([isDeleted])
+  @@index([isDeleted, passportExpirationDate])
+  @@index([isDeleted, cempnExpirationDate])
+  @@map("students")
+}
+
+model Language {
+  id   String    @id @default(cuid())
+  name String
+  level CEFRLevel
+
+  studentId String
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("languages")
+}
+
+model AirlineCriteria {
+  id          String @id @default(cuid())
+  airlineName String @unique
+
+  minHeightFemale            Float?
+  minHeightMale              Float?
+  minArmReach                Float?
+  maxBMI                     Float?
+  maxAge                     Int?
+  requiredCempnValidityMonths Int?
+  requiredSwimming           Boolean @default(true)
+  requiredLanguages          String? // JSON: [{"name":"English","minLevel":"B2"}]
+  notes                      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("airline_criteria")
+}

@@ -1,27 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --navy: #0A192F;
+    --gold: #D4AF37;
+    --slate: #64748B;
+    --bg-primary: #F8FAFC;
+    --bg-card: #FFFFFF;
+    --border: #E2E8F0;
+    --text-primary: #0F172A;
+    --text-secondary: #64748B;
+  }
+
+  .dark {
+    --bg-primary: #0B1120;
+    --bg-card: #131E38;
+    --border: rgba(255, 255, 255, 0.08);
+    --text-primary: #F8FAFC;
+    --text-secondary: #94A3B8;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Premium scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+  }
+
+  /* Dark scrollbar */
+  .dark ::-webkit-scrollbar-thumb {
+    background: #1E2B4A;
+  }
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #2A3B66;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+@layer components {
+  /* Card styles */
+  .card {
+    @apply bg-white rounded-xl border border-slate-100 shadow-card transition-colors duration-200
+      dark:bg-cockpit-surface dark:border-cockpit-border dark:shadow-none;
   }
+  .card:hover {
+    @apply shadow-card-hover dark:shadow-none dark:border-white/15;
+  }
+
+  /* Gold gradient button */
+  .btn-gold {
+    @apply px-5 py-2.5 rounded-lg font-semibold text-sm text-navy
+      bg-gradient-to-r from-gold-300 to-gold-500
+      hover:from-gold-400 hover:to-gold-600
+      shadow-sm hover:shadow-md
+      transition-all duration-200 ease-out
+      active:scale-[0.98];
+  }
+
+  /* Navy primary button */
+  .btn-primary {
+    @apply px-5 py-2.5 rounded-lg font-semibold text-sm text-white
+      bg-navy hover:bg-navy-400
+      shadow-sm hover:shadow-md
+      transition-all duration-200 ease-out
+      active:scale-[0.98]
+      dark:bg-amtc-blue dark:hover:bg-amtc-blueHover;
+  }
+
+  /* Secondary button */
+  .btn-secondary {
+    @apply px-5 py-2.5 rounded-lg font-semibold text-sm text-navy-500
+      bg-white border border-slate-200
+      hover:bg-slate-50 hover:border-slate-300
+      shadow-sm transition-colors duration-200 ease-out
+      active:scale-[0.98]
+      dark:bg-cockpit-surface dark:border-cockpit-border dark:text-slate-200
+      dark:hover:bg-cockpit-hover dark:hover:border-white/20;
+  }
+
+  /* Danger button */
+  .btn-danger {
+    @apply px-5 py-2.5 rounded-lg font-semibold text-sm text-white
+      bg-red-500 hover:bg-red-600
+      shadow-sm hover:shadow-md
+      transition-all duration-200 ease-out
+      active:scale-[0.98];
+  }
+
+  /* WhatsApp button */
+  .btn-whatsapp {
+    @apply shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-medium rounded-lg transition-colors shadow-sm active:scale-[0.98];
+  }
+
+  /* Form input */
+  .input {
+    @apply w-full px-4 py-2.5 rounded-lg text-sm
+      border border-slate-200 bg-white
+      focus:border-gold focus:ring-2 focus:ring-gold/20
+      placeholder:text-slate-400
+      transition-colors duration-200 outline-none
+      dark:bg-cockpit-input dark:border-cockpit-border dark:text-slate-100
+      dark:placeholder:text-slate-500 dark:focus:border-amtc-blue dark:focus:ring-amtc-blue/20;
+  }
+
+  /* Select */
+  .select {
+    @apply w-full px-4 py-2.5 rounded-lg text-sm
+      border border-slate-200 bg-white
+      focus:border-gold focus:ring-2 focus:ring-gold/20
+      transition-colors duration-200 outline-none
+      appearance-none cursor-pointer
+      dark:bg-cockpit-input dark:border-cockpit-border dark:text-slate-100
+      dark:focus:border-amtc-blue dark:focus:ring-amtc-blue/20;
+  }
+
+  /* Label */
+  .label {
+    @apply block text-sm font-medium text-slate-700 mb-1.5
+      dark:text-slate-300;
+  }
+
+  /* Status badge */
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold;
+  }
+
+  /* Section title */
+  .section-title {
+    @apply text-lg font-bold text-navy tracking-tight
+      dark:text-slate-100;
+  }
+
+  /* Page title */
+  .page-title {
+    @apply text-2xl font-bold text-navy tracking-tight
+      dark:text-slate-100;
+  }
+
+  /* Stagger animation children */
+  .stagger-children > * {
+    @apply animate-slide-up;
+  }
+  .stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger-children > *:nth-child(2) { animation-delay: 75ms; }
+  .stagger-children > *:nth-child(3) { animation-delay: 150ms; }
+  .stagger-children > *:nth-child(4) { animation-delay: 225ms; }
+  .stagger-children > *:nth-child(5) { animation-delay: 300ms; }
+  .stagger-children > *:nth-child(6) { animation-delay: 375ms; }
 }
