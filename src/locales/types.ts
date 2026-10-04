@@ -165,6 +165,8 @@ export interface Translations {
     saveChanges: string;
     createStudent: string;
     failedToSave: string;
+    exportPdf: string;
+    generatingPdf: string;
   };
   alerts: {
     title: string;

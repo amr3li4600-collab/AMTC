@@ -47,10 +47,14 @@ export async function POST(req: NextRequest) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stream = await renderToStream(element as any);
 
+    const filename = students.length === 1 && students[0].fullName
+      ? `AMTC_${students[0].fullName.replace(/[^a-zA-Z0-9_-]/g, "_")}_Portfolio.pdf`
+      : `AMTC_${airlineName ? airlineName.replace(/[^a-zA-Z0-9_-]/g, "_") : "Candidates"}.pdf`;
+
     return new NextResponse(stream as unknown as ReadableStream, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="AMTC_Candidates.pdf"`,
+        "Content-Disposition": `attachment; filename="${filename}"`,
       },
     });
   } catch (error) {

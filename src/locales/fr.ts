@@ -165,6 +165,8 @@ export const fr: Translations = {
     saveChanges: "Enregistrer les modifications",
     createStudent: "Créer l'étudiant",
     failedToSave: "Échec de l'enregistrement de l'étudiant",
+    exportPdf: "Exporter le portfolio PDF",
+    generatingPdf: "Génération du PDF...",
   },
   alerts: {
     title: "Documents expirants & Rappels",

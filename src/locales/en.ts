@@ -165,6 +165,8 @@ export const en: Translations = {
     saveChanges: "Save Changes",
     createStudent: "Create Student",
     failedToSave: "Failed to save student",
+    exportPdf: "Export PDF Portfolio",
+    generatingPdf: "Generating PDF...",
   },
   alerts: {
     title: "Expiring Documents & Reminders",
