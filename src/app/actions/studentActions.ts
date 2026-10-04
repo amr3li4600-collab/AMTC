@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { calculateBMI, evaluateCEMPNStatus, daysUntil } from "@/lib/utils";
 import type { Student, Language, CEFRLevel, Gender, SwimmingStatus, DGACStatus, PlacementStatus } from "@/generated/prisma/client";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, unstable_cache } from "next/cache";
 import { requireAdminSession } from "@/lib/auth";
 
 // ─── Types ───────────────────────────────────────────────
@@ -83,12 +83,16 @@ export async function createStudent(input: CreateStudentInput) {
     include: { languages: true },
   });
 
+  revalidatePath('/admin');
+  revalidatePath('/admin/students');
+  revalidatePath('/admin/eligibility');
+
   return student;
 }
 
 // ─── READ ────────────────────────────────────────────────
 
-export async function getStudents(search?: string) {
+export const getStudents = unstable_cache(async (search?: string) => {
   const students = await prisma.student.findMany({
     where: {
       isDeleted: false,
@@ -108,7 +112,7 @@ export async function getStudents(search?: string) {
   });
 
   return students;
-}
+}, ["students-list"], { tags: ["students"] });
 
 export async function getStudent(id: string) {
   const student = await prisma.student.findUnique({
@@ -184,6 +188,10 @@ export async function updateStudent(id: string, input: Partial<CreateStudentInpu
     },
     include: { languages: true },
   });
+
+  revalidatePath('/admin');
+  revalidatePath('/admin/students');
+  revalidatePath('/admin/eligibility');
 
   return student;
 }
@@ -275,9 +283,9 @@ export interface PaginatedExpiringDocumentsResult {
   };
 }
 
-export async function getPaginatedExpiringDocuments(
+export const getPaginatedExpiringDocuments = unstable_cache(async (
   params: GetPaginatedExpiringDocumentsParams = {}
-): Promise<PaginatedExpiringDocumentsResult> {
+): Promise<PaginatedExpiringDocumentsResult> => {
   const {
     page = 1,
     limit = 10,
@@ -478,11 +486,11 @@ export async function getPaginatedExpiringDocuments(
       cempnCount,
     },
   };
-}
+}, ["expiring-documents"], { tags: ["students"] });
 
 // ─── DASHBOARD STATS ─────────────────────────────────────
 
-export async function getDashboardStats() {
+export const getDashboardStats = unstable_cache(async () => {
   const now = new Date();
   const cempnThreshold = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
   const passportThreshold = new Date(now.getTime() + 180 * 24 * 60 * 60 * 1000);
@@ -572,7 +580,7 @@ export async function getDashboardStats() {
     // Top 5 most urgent alerts for dashboard widget performance
     expiringDocuments: expiring.slice(0, 5),
   };
-}
+}, ["dashboard-stats"], { tags: ["dashboard", "students"] });
 
 export async function getRecentStudents() {
   return prisma.student.findMany({

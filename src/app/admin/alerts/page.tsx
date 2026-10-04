@@ -1,8 +1,6 @@
 import { getPaginatedExpiringDocuments } from "@/app/actions/studentActions";
 import { AlertsView } from "@/components/AlertsView";
 
-export const dynamic = "force-dynamic";
-
 interface AlertsPageProps {
   searchParams: {
     page?: string;
