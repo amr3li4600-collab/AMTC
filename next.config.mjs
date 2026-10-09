@@ -1,4 +1,19 @@
 /** @type {import('next').NextConfig} */
+
+// Build-time validation of essential environment variables
+if (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1') {
+  const requiredEnvs = ['ADMIN_EMAIL', 'ADMIN_PASSWORD', 'ADMIN_SESSION_SECRET'];
+  const missingEnvs = requiredEnvs.filter(env => !process.env[env]);
+  
+  if (missingEnvs.length > 0) {
+    throw new Error(`\n❌ SECURITY ERROR: Missing required environment variables: ${missingEnvs.join(', ')}.\nPlease configure these in your Vercel deployment settings.\n`);
+  }
+
+  if (process.env.ADMIN_SESSION_SECRET && process.env.ADMIN_SESSION_SECRET.length < 32) {
+    throw new Error("\n❌ SECURITY ERROR: ADMIN_SESSION_SECRET must be at least 32 characters long in production.\n");
+  }
+}
+
 const nextConfig = {
   poweredByHeader: false,
   async headers() {
